@@ -137,10 +137,30 @@ function updateConsumable(vid, item, date, mileage) {
 function getConsumableStatus(vid) {
   const vehicle = getVehicle(vid); if (!vehicle) return [];
   const consumables = getConsumables(vid);
+  const repairs = getRepairLogs(vid);
   const currentMileage = vehicle.mileage || 0;
   const now = new Date();
+
+  // 정비 기록에서 각 소모품의 가장 최근 교체 내역을 찾는다
+  const fromRepairs = {};
+  repairs.forEach(r => {
+    const cKey = REPAIR_TO_CONSUMABLE[r.category];
+    if (!cKey) return;
+    const prev = fromRepairs[cKey];
+    if (!prev || new Date(r.date) > new Date(prev.lastDate)) {
+      fromRepairs[cKey] = { lastDate: r.date, lastMileage: r.mileage || null };
+    }
+  });
+
   return Object.entries(CONSUMABLE_DEFAULTS).map(([key, def]) => {
-    const data = consumables[key];
+    // 직접 입력한 소모품 기록과 정비 기록 중 더 최근 것을 사용
+    const manual = consumables[key];
+    const repair = fromRepairs[key];
+    let data = manual;
+    if (repair && (!manual || new Date(repair.lastDate) >= new Date(manual.lastDate))) {
+      data = repair;
+    }
+
     let status = 'ok', pct = 0, detail = '기록 없음';
     if (data) {
       const daysPassed = Math.floor((now - new Date(data.lastDate)) / 86400000);
@@ -225,12 +245,13 @@ function importData(json) {
 // ── 앱 설정 (이름, 테마) ──
 const SETTINGS_KEY = 'carManager_settings';
 const THEMES = {
-  amber:  { name: '앰버 (기본)', accent: '#f0a500', accent2: '#ff6b35' },
-  blue:   { name: '블루',        accent: '#4d8eff', accent2: '#2ec6ff' },
-  green:  { name: '그린',        accent: '#2ecc71', accent2: '#26d0a0' },
-  purple: { name: '퍼플',        accent: '#9b6dff', accent2: '#c66dff' },
-  red:    { name: '레드',        accent: '#ff5470', accent2: '#ff8a5c' },
-  teal:   { name: '틸',          accent: '#1abc9c', accent2: '#48c9b0' },
+  amber:  { name: '앰버 (기본)', accent: '#f0a500', accent2: '#ff6b35', bg: '#0f1117', surface: '#1e2235', surface2: '#252a40', bg3: '#22263a', border: '#2e3455' },
+  blue:   { name: '블루',        accent: '#4d8eff', accent2: '#2ec6ff', bg: '#0d1220', surface: '#172033', surface2: '#1f2b42', bg3: '#1c2740', border: '#2a3a55' },
+  green:  { name: '그린',        accent: '#2ecc71', accent2: '#26d0a0', bg: '#0c1410', surface: '#15211b', surface2: '#1d2c24', bg3: '#1a2820', border: '#28402f' },
+  purple: { name: '퍼플',        accent: '#9b6dff', accent2: '#c66dff', bg: '#120f1c', surface: '#1f1a2e', surface2: '#28213a', bg3: '#241d36', border: '#382e55' },
+  red:    { name: '레드',        accent: '#ff5470', accent2: '#ff8a5c', bg: '#160e12', surface: '#23161b', surface2: '#2e1d24', bg3: '#2a1a20', border: '#4a2832' },
+  teal:   { name: '틸',          accent: '#1abc9c', accent2: '#48c9b0', bg: '#0a1413', surface: '#13211f', surface2: '#1b2c29', bg3: '#182826', border: '#264340' },
+  light:  { name: '라이트',      accent: '#e8920a', accent2: '#ff6b35', bg: '#f4f5f8', surface: '#ffffff', surface2: '#eef0f5', bg3: '#e8ebf1', border: '#d9dde6', text: '#1a1d27', text2: '#5a607a', text3: '#9499b0' },
 };
 
 function getSettings() {
