@@ -221,3 +221,23 @@ function importData(json) {
   try { const d=JSON.parse(json); if(!d.vehicles) throw 0; localStorage.setItem(DB_KEY,JSON.stringify(d)); return true; }
   catch { return false; }
 }
+
+// ── 앱 설정 (이름, 테마) ──
+const SETTINGS_KEY = 'carManager_settings';
+const THEMES = {
+  amber:  { name: '앰버 (기본)', accent: '#f0a500', accent2: '#ff6b35' },
+  blue:   { name: '블루',        accent: '#4d8eff', accent2: '#2ec6ff' },
+  green:  { name: '그린',        accent: '#2ecc71', accent2: '#26d0a0' },
+  purple: { name: '퍼플',        accent: '#9b6dff', accent2: '#c66dff' },
+  red:    { name: '레드',        accent: '#ff5470', accent2: '#ff8a5c' },
+  teal:   { name: '틸',          accent: '#1abc9c', accent2: '#48c9b0' },
+};
+
+function getSettings() {
+  try {
+    return Object.assign({ appName: '카매니저', theme: 'amber' }, JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {});
+  } catch { return { appName: '카매니저', theme: 'amber' }; }
+}
+function saveSettings(s) {
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(Object.assign(getSettings(), s)));
+}
