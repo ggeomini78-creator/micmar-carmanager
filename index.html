@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>카매니저 — 정비일지 & 차계부</title>
+  <title>카매니저</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Bebas+Neue&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -11,12 +11,12 @@
 <body>
 <div class="app-shell">
 
-<!-- 사이드바 -->
+<!-- ══ 사이드바 (데스크탑 고정 / 모바일 드로어) ══ -->
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <span class="logo-icon">🚗</span>
     <span class="logo-text">카매니저</span>
-    <button class="modal-close" id="sidebarCloseBtn" style="display:none;margin-left:auto">✕</button>
+    <button class="sidebar-close-btn" id="sidebarCloseBtn">✕</button>
   </div>
   <div class="vehicle-selector">
     <select id="vehicleSelect" class="vehicle-select"></select>
@@ -37,12 +37,12 @@
   </div>
 </nav>
 
-<!-- 메인 -->
+<!-- ══ 메인 ══ -->
 <div class="main-wrapper">
   <header class="topbar">
     <button class="hamburger" id="hamburger">☰</button>
     <h1 class="page-title" id="pageTitle">대시보드</h1>
-    <span class="current-vehicle-badge" id="currentVehicleBadge">차량 미선택</span>
+    <span class="current-vehicle-badge" id="currentVehicleBadge">미선택</span>
   </header>
 
   <div class="page-container">
@@ -52,10 +52,11 @@
       <div class="no-vehicle-msg" id="noVehicleMsg">
         <div class="empty-icon">🚗</div>
         <h2>차량을 먼저 등록해주세요</h2>
-        <p>왼쪽 메뉴에서 '차량 추가' 버튼을 눌러 시작하세요.</p>
+        <p>왼쪽 '차량 추가' 버튼을 눌러 시작하세요.</p>
         <button class="btn-primary" id="btnAddVehicleMain">차량 추가하기</button>
       </div>
       <div id="dashboardContent" style="display:none">
+        <!-- stat 카드 -->
         <div class="stat-grid">
           <div class="stat-card accent" id="cardMileage">
             <div class="stat-label">총 주행거리</div>
@@ -76,6 +77,24 @@
             <div class="stat-label">총 정비 횟수</div>
             <div class="stat-value" id="statRepair">—회</div>
             <div class="stat-hint">클릭 → 정비 기록</div>
+          </div>
+        </div>
+        <!-- 캘린더 + 소모품/활동 -->
+        <div class="card" style="margin-bottom:.8rem">
+          <div class="cal-header">
+            <button class="cal-nav" id="calPrev">‹</button>
+            <span class="cal-title" id="calTitle"></span>
+            <button class="cal-nav" id="calNext">›</button>
+          </div>
+          <div class="cal-grid" id="calGrid">
+            <div class="cal-dow">일</div><div class="cal-dow">월</div><div class="cal-dow">화</div>
+            <div class="cal-dow">수</div><div class="cal-dow">목</div><div class="cal-dow">금</div>
+            <div class="cal-dow">토</div>
+          </div>
+          <div style="display:flex;gap:1rem;margin-top:.7rem;font-size:.72rem;color:var(--text3)">
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:3px"></span>주유</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--blue);margin-right:3px"></span>정비</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--orange);margin-right:3px"></span>지출</span>
           </div>
         </div>
         <div class="dashboard-row">
@@ -135,7 +154,7 @@
     <!-- 소모품 관리 -->
     <section class="page" id="page-consumables">
       <div class="page-header">
-        <h2>소모품 교체주기 관리</h2>
+        <h2>소모품 교체주기</h2>
         <button class="btn-primary" id="btnUpdateConsumable">교체 기록 추가</button>
       </div>
       <div class="consumable-grid" id="consumableGrid"></div>
@@ -165,33 +184,31 @@
         <select id="statYear" class="select-sm"></select>
       </div>
       <div class="stats-grid">
-        <div class="card">
-          <div class="card-title">월별 지출</div>
-          <div class="chart-wrap"><canvas id="monthlyChart"></canvas></div>
-        </div>
-        <div class="card">
-          <div class="card-title">지출 카테고리</div>
-          <div class="chart-wrap"><canvas id="categoryChart"></canvas></div>
-        </div>
+        <div class="card"><div class="card-title">월별 지출</div><div class="chart-wrap"><canvas id="monthlyChart"></canvas></div></div>
+        <div class="card"><div class="card-title">지출 카테고리</div><div class="chart-wrap"><canvas id="categoryChart"></canvas></div></div>
       </div>
-      <div class="card">
-        <div class="card-title">연비 추이</div>
-        <div class="chart-wrap"><canvas id="fuelChart"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">연간 요약</div>
-        <div id="yearSummary" class="year-summary"></div>
-      </div>
+      <div class="card"><div class="card-title">연비 추이</div><div class="chart-wrap"><canvas id="fuelChart"></canvas></div></div>
+      <div class="card"><div class="card-title">연간 요약</div><div id="yearSummary" class="year-summary"></div></div>
     </section>
 
-  </div>
-</div>
-</div>
+  </div><!-- /page-container -->
 
-<!-- 오버레이 -->
+  <!-- ══ 모바일 하단 탭바 ══ -->
+  <nav class="mobile-tabs">
+    <div class="tab-item active" data-page="dashboard"><span class="tab-icon">📊</span>홈</div>
+    <div class="tab-item" data-page="fuel"><span class="tab-icon">⛽</span>주유</div>
+    <div class="tab-item" data-page="repair"><span class="tab-icon">🔧</span>정비</div>
+    <div class="tab-item" data-page="consumables"><span class="tab-icon">⏱️</span>소모품</div>
+    <div class="tab-item" data-page="expense"><span class="tab-icon">💳</span>지출</div>
+    <div class="tab-item" data-page="stats"><span class="tab-icon">📈</span>통계</div>
+  </nav>
+
+</div><!-- /main-wrapper -->
+</div><!-- /app-shell -->
+
 <div class="overlay" id="overlay"></div>
 
-<!-- ── 모달: 차량 추가 ── -->
+<!-- ══ 모달: 차량 추가 ══ -->
 <div class="modal" id="modalVehicle">
   <div class="modal-box">
     <div class="modal-header"><h3>차량 추가</h3><button class="modal-close">✕</button></div>
@@ -202,8 +219,8 @@
         <div class="form-group"><label>모델명</label><input type="text" id="vModel" placeholder="예: 아반떼"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>연식</label><input type="number" id="vYear" placeholder="예: 2022" min="1990" max="2030"></div>
-        <div class="form-group"><label>차량번호</label><input type="text" id="vPlate" placeholder="예: 123가 4567"></div>
+        <div class="form-group"><label>연식</label><input type="number" id="vYear" placeholder="2022" min="1990" max="2030"></div>
+        <div class="form-group"><label>차량번호</label><input type="text" id="vPlate" placeholder="123가 4567"></div>
       </div>
       <div class="form-group"><label>현재 주행거리 (km)</label><input type="number" id="vMileage" placeholder="예: 25000" min="0"></div>
     </div>
@@ -214,7 +231,7 @@
   </div>
 </div>
 
-<!-- ── 모달: 주유 기록 ── -->
+<!-- ══ 모달: 주유 기록 ══ -->
 <div class="modal" id="modalFuel">
   <div class="modal-box">
     <div class="modal-header"><h3 id="modalFuelTitle">주유 기록 추가</h3><button class="modal-close">✕</button></div>
@@ -223,7 +240,8 @@
         <div class="form-group"><label>날짜 *</label><input type="date" id="fDate"></div>
         <div class="form-group"><label>주행거리 (km)</label><input type="number" id="fMileage" placeholder="계기판 숫자" min="0"></div>
       </div>
-      <div class="form-group"><label>입력 방식</label>
+      <div class="form-group">
+        <label>입력 방식</label>
         <div class="fuel-input-toggle">
           <button class="toggle-btn active" id="toggleLiter">리터로 입력</button>
           <button class="toggle-btn" id="toggleAmount">금액으로 입력</button>
@@ -235,13 +253,13 @@
           <div class="form-group"><label>주유량 (L) *</label><input type="number" id="fAmount" placeholder="예: 45.3" step="0.1" min="0"></div>
           <div class="form-group"><label>단가 (원/L)</label><input type="number" id="fPrice" placeholder="예: 1650" min="0"></div>
         </div>
-        <div class="form-group"><label>총 금액 (자동)</label><input type="number" id="fTotalCalc" readonly></div>
+        <div class="form-group"><label>총 금액 (자동 계산)</label><input type="number" id="fTotalCalc" readonly></div>
       </div>
       <!-- 금액 입력 -->
       <div id="fuelRowAmount" style="display:none">
         <div class="form-row">
           <div class="form-group"><label>결제 금액 (원) *</label><input type="number" id="fTotal2" placeholder="예: 70000" min="0"></div>
-          <div class="form-group"><label>단가 (원/L)</label><input type="number" id="fPrice" placeholder="예: 1650" min="0"></div>
+          <div class="form-group"><label>단가 (원/L)</label><input type="number" id="fPriceAmt" placeholder="예: 1650" min="0"></div>
         </div>
         <div class="form-group"><label>주유량 (자동 계산)</label><input type="number" id="fAmountCalc" readonly></div>
       </div>
@@ -258,7 +276,7 @@
   </div>
 </div>
 
-<!-- ── 모달: 정비 기록 ── -->
+<!-- ══ 모달: 정비 기록 ══ -->
 <div class="modal" id="modalRepair">
   <div class="modal-box">
     <div class="modal-header"><h3 id="modalRepairTitle">정비 기록 추가</h3><button class="modal-close">✕</button></div>
@@ -290,7 +308,7 @@
   </div>
 </div>
 
-<!-- ── 모달: 소모품 ── -->
+<!-- ══ 모달: 소모품 ══ -->
 <div class="modal" id="modalConsumable">
   <div class="modal-box">
     <div class="modal-header"><h3>소모품 교체 기록</h3><button class="modal-close">✕</button></div>
@@ -315,7 +333,7 @@
   </div>
 </div>
 
-<!-- ── 모달: 지출 ── -->
+<!-- ══ 모달: 지출 ══ -->
 <div class="modal" id="modalExpense">
   <div class="modal-box">
     <div class="modal-header"><h3 id="modalExpenseTitle">지출 추가</h3><button class="modal-close">✕</button></div>
@@ -343,7 +361,6 @@
 </div>
 
 <div class="toast" id="toast"></div>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="js/data.js"></script>
 <script src="js/app.js"></script>
