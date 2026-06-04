@@ -26,10 +26,21 @@ function applySettings() {
   document.title = s.appName;
   const theme = THEMES[s.theme] || THEMES.amber;
   const root = document.documentElement;
-  root.style.setProperty('--accent', theme.accent);
-  root.style.setProperty('--accent2', theme.accent2);
-  root.style.setProperty('--accent-rgb', hexToRgb(theme.accent));
-  root.style.setProperty('--accent2-rgb', hexToRgb(theme.accent2));
+  const set = (k, v) => { if (v) root.style.setProperty(k, v); };
+  set('--accent', theme.accent);
+  set('--accent2', theme.accent2);
+  set('--accent-rgb', hexToRgb(theme.accent));
+  set('--accent2-rgb', hexToRgb(theme.accent2));
+  set('--bg', theme.bg);
+  set('--surface', theme.surface);
+  set('--surface2', theme.surface2);
+  set('--bg3', theme.bg3);
+  set('--border', theme.border);
+  // 텍스트 (라이트 테마 대응) — 없으면 기본 다크값으로 복원
+  set('--text', theme.text || '#e8eaf0');
+  set('--text2', theme.text2 || '#8b90a8');
+  set('--text3', theme.text3 || '#5a5f7a');
+  set('--bg2', theme.surface2 || '#1a1d27');
 }
 
 function hexToRgb(hex) {
@@ -450,14 +461,19 @@ function drawStats(year) {
   const css = getComputedStyle(document.documentElement);
   const accent = css.getPropertyValue('--accent').trim() || '#f0a500';
   const accentRgb = css.getPropertyValue('--accent-rgb').trim() || '240,165,0';
+  const txt2 = css.getPropertyValue('--text2').trim() || '#8b90a8';
+  const txt3 = css.getPropertyValue('--text3').trim() || '#5a5f7a';
+  const surface = css.getPropertyValue('--surface').trim() || '#1e2235';
+  const border = css.getPropertyValue('--border').trim() || '#2e3455';
+  const gridColor = `rgba(${hexToRgb(border)},.4)`;
   const monthly = getMonthlyStats(currentVehicleId, year);
   const labels = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
   const co = (s={}) => ({
     responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{labels:{color:'#8b90a8',font:{size:11}}}, tooltip:{backgroundColor:'#22263a',borderColor:'#2e3455',borderWidth:1} },
+    plugins:{ legend:{labels:{color:txt2,font:{size:11}}}, tooltip:{backgroundColor:surface,borderColor:border,borderWidth:1} },
     scales: s.noScale ? undefined : {
-      x:{stacked:!!s.stacked,ticks:{color:'#5a5f7a'},grid:{color:'rgba(46,52,85,.4)'}},
-      y:{stacked:!!s.stacked,ticks:{color:'#5a5f7a'},grid:{color:'rgba(46,52,85,.4)'}}
+      x:{stacked:!!s.stacked,ticks:{color:txt3},grid:{color:gridColor}},
+      y:{stacked:!!s.stacked,ticks:{color:txt3},grid:{color:gridColor}}
     }
   });
 
@@ -478,7 +494,7 @@ function drawStats(year) {
     charts.categoryChart = new Chart(document.getElementById('categoryChart'), {
       type:'doughnut',
       data:{ labels:Object.keys(cat), datasets:[{data:Object.values(cat), backgroundColor:[`rgba(${accentRgb},.85)`,'rgba(77,142,255,.8)','rgba(255,107,53,.8)','rgba(46,204,113,.8)','rgba(155,89,182,.8)','rgba(255,159,67,.8)','rgba(72,219,251,.8)']}] },
-      options:{ ...co({noScale:true}), plugins:{ legend:{position:'right',labels:{color:'#8b90a8',font:{size:11},boxWidth:12}} } }
+      options:{ ...co({noScale:true}), plugins:{ legend:{position:'right',labels:{color:txt2,font:{size:11},boxWidth:12}} } }
     });
   }
 
