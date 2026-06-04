@@ -8,7 +8,8 @@ let calPopupTimer = null;
 document.addEventListener('DOMContentLoaded', () => {
   const now = new Date();
   calYear = now.getFullYear(); calMonth = now.getMonth();
-  initNav(); initModals(); initButtons(); initImportExport();
+  applySettings();
+  initNav(); initModals(); initButtons(); initImportExport(); initSettings();
   const saved = localStorage.getItem('carManager_currentVehicle');
   const vehicles = getVehicles();
   if (saved && vehicles.find(v => v.id === saved)) setCurrentVehicle(saved);
@@ -17,6 +18,68 @@ document.addEventListener('DOMContentLoaded', () => {
   renderPage('dashboard');
   setTodayDates();
 });
+
+// ── 설정 적용 (이름 + 테마) ──
+function applySettings() {
+  const s = getSettings();
+  document.getElementById('logoText').textContent = s.appName;
+  document.title = s.appName;
+  const theme = THEMES[s.theme] || THEMES.amber;
+  const root = document.documentElement;
+  root.style.setProperty('--accent', theme.accent);
+  root.style.setProperty('--accent2', theme.accent2);
+  root.style.setProperty('--accent-rgb', hexToRgb(theme.accent));
+  root.style.setProperty('--accent2-rgb', hexToRgb(theme.accent2));
+}
+
+function hexToRgb(hex) {
+  const m = hex.replace('#','').match(/.{2}/g);
+  return m ? m.map(x => parseInt(x,16)).join(',') : '240,165,0';
+}
+
+// ── 설정 메뉴 동작 ──
+function initSettings() {
+  document.getElementById('btnEditName').onclick = () => {
+    document.getElementById('appNameInput').value = getSettings().appName;
+    closeSidebar(); openModal('modalName');
+  };
+  document.getElementById('btnSaveName').onclick = () => {
+    const name = document.getElementById('appNameInput').value.trim();
+    if (!name) { showToast('⚠️ 이름을 입력해주세요'); return; }
+    saveSettings({ appName: name });
+    applySettings();
+    document.getElementById('modalName').classList.remove('open');
+    showToast('✅ 앱 이름이 변경되었습니다');
+  };
+
+  document.getElementById('btnTheme').onclick = () => {
+    renderThemeGrid(); closeSidebar(); openModal('modalTheme');
+  };
+}
+
+function renderThemeGrid() {
+  const grid = document.getElementById('themeGrid');
+  const current = getSettings().theme;
+  grid.innerHTML = '';
+  Object.entries(THEMES).forEach(([key, t]) => {
+    const opt = document.createElement('div');
+    opt.className = 'theme-option' + (key===current?' active':'');
+    opt.innerHTML = `
+      <div class="theme-swatch" style="background:linear-gradient(135deg,${t.accent} 50%,${t.accent2} 50%)"></div>
+      <span class="theme-name">${t.name}</span>
+      ${key===current?'<span class="theme-check">✓</span>':''}`;
+    opt.onclick = () => {
+      saveSettings({ theme: key });
+      applySettings();
+      renderThemeGrid();
+      // 차트 다시 그리기 (색상 반영)
+      const active = document.querySelector('.nav-item.active, .tab-item.active');
+      if (active && active.dataset.page === 'stats') renderStatsPage();
+      showToast('✅ 테마가 변경되었습니다');
+    };
+    grid.appendChild(opt);
+  });
+}
 
 // ── 날짜 기본값 ──
 function setTodayDates() {
@@ -384,6 +447,9 @@ function renderStatsPage() {
 }
 
 function drawStats(year) {
+  const css = getComputedStyle(document.documentElement);
+  const accent = css.getPropertyValue('--accent').trim() || '#f0a500';
+  const accentRgb = css.getPropertyValue('--accent-rgb').trim() || '240,165,0';
   const monthly = getMonthlyStats(currentVehicleId, year);
   const labels = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
   const co = (s={}) => ({
@@ -399,7 +465,7 @@ function drawStats(year) {
   charts.monthlyChart = new Chart(document.getElementById('monthlyChart'), {
     type:'bar',
     data:{ labels, datasets:[
-      {label:'주유',data:monthly.map(m=>m.fuel),backgroundColor:'rgba(240,165,0,.7)'},
+      {label:'주유',data:monthly.map(m=>m.fuel),backgroundColor:`rgba(${accentRgb},.75)`},
       {label:'정비',data:monthly.map(m=>m.repair),backgroundColor:'rgba(77,142,255,.7)'},
       {label:'기타',data:monthly.map(m=>m.expense),backgroundColor:'rgba(255,107,53,.7)'},
     ]},
@@ -411,7 +477,7 @@ function drawStats(year) {
   if (Object.keys(cat).length) {
     charts.categoryChart = new Chart(document.getElementById('categoryChart'), {
       type:'doughnut',
-      data:{ labels:Object.keys(cat), datasets:[{data:Object.values(cat), backgroundColor:['rgba(240,165,0,.8)','rgba(77,142,255,.8)','rgba(255,107,53,.8)','rgba(46,204,113,.8)','rgba(155,89,182,.8)','rgba(255,159,67,.8)','rgba(72,219,251,.8)']}] },
+      data:{ labels:Object.keys(cat), datasets:[{data:Object.values(cat), backgroundColor:[`rgba(${accentRgb},.85)`,'rgba(77,142,255,.8)','rgba(255,107,53,.8)','rgba(46,204,113,.8)','rgba(155,89,182,.8)','rgba(255,159,67,.8)','rgba(72,219,251,.8)']}] },
       options:{ ...co({noScale:true}), plugins:{ legend:{position:'right',labels:{color:'#8b90a8',font:{size:11},boxWidth:12}} } }
     });
   }
