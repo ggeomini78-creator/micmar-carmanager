@@ -24,6 +24,11 @@ function applySettings() {
   const s = getSettings();
   document.getElementById('logoText').textContent = s.appName;
   document.title = s.appName;
+  // iOS 홈화면 타이틀 갱신
+  const iosTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+  if (iosTitle) iosTitle.setAttribute('content', s.appName);
+  // 동적 매니페스트 (앱 이름 반영)
+  updateManifest(s.appName);
   const theme = THEMES[s.theme] || THEMES.amber;
   const root = document.documentElement;
   const set = (k, v) => { if (v) root.style.setProperty(k, v); };
@@ -36,11 +41,32 @@ function applySettings() {
   set('--surface2', theme.surface2);
   set('--bg3', theme.bg3);
   set('--border', theme.border);
-  // 텍스트 (라이트 테마 대응) — 없으면 기본 다크값으로 복원
   set('--text', theme.text || '#e8eaf0');
   set('--text2', theme.text2 || '#8b90a8');
   set('--text3', theme.text3 || '#5a5f7a');
   set('--bg2', theme.surface2 || '#1a1d27');
+  // 상태바 색상도 테마 배경으로
+  const themeColor = document.querySelector('meta[name="theme-color"]');
+  if (themeColor) themeColor.setAttribute('content', theme.surface || '#1a1d27');
+}
+
+function updateManifest(appName) {
+  try {
+    const manifest = {
+      name: appName, short_name: appName,
+      description: '자동차 정비일지 및 차계부',
+      start_url: './index.html', display: 'standalone',
+      background_color: '#0f1117', theme_color: '#1a1d27', orientation: 'portrait',
+      icons: [
+        { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+        { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+      ],
+    };
+    const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    let link = document.querySelector('link[rel="manifest"]');
+    if (link) link.setAttribute('href', url);
+  } catch {}
 }
 
 function hexToRgb(hex) {
