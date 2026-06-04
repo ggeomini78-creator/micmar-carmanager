@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>카매니저</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Bebas+Neue&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -11,18 +13,20 @@
 <body>
 <div class="app-shell">
 
-<!-- ══ 사이드바 (데스크탑 고정 / 모바일 드로어) ══ -->
+<!-- ══ 사이드바 (데스크탑: 페이지 메뉴 / 모바일: 설정 드로어) ══ -->
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <span class="logo-icon">🚗</span>
-    <span class="logo-text">카매니저</span>
+    <span class="logo-text" id="logoText">카매니저</span>
     <button class="sidebar-close-btn" id="sidebarCloseBtn">✕</button>
   </div>
   <div class="vehicle-selector">
     <select id="vehicleSelect" class="vehicle-select"></select>
     <button class="btn-add-vehicle" id="btnAddVehicle">+ 차량 추가</button>
   </div>
-  <ul class="nav-menu">
+
+  <!-- 데스크탑 전용 페이지 메뉴 -->
+  <ul class="nav-menu sidebar-desktop-only">
     <li class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span>대시보드</li>
     <li class="nav-item" data-page="fuel"><span class="nav-icon">⛽</span>주유 기록</li>
     <li class="nav-item" data-page="repair"><span class="nav-icon">🔧</span>정비 기록</li>
@@ -30,9 +34,14 @@
     <li class="nav-item" data-page="expense"><span class="nav-icon">💳</span>기타 지출</li>
     <li class="nav-item" data-page="stats"><span class="nav-icon">📈</span>통계</li>
   </ul>
-  <div class="sidebar-footer">
-    <button class="btn-export" id="btnExport">📤 내보내기</button>
-    <button class="btn-import" id="btnImport">📥 불러오기</button>
+
+  <!-- 설정 메뉴 (모든 화면 공통) -->
+  <div class="settings-menu">
+    <div class="settings-label">설정</div>
+    <button class="settings-item" id="btnEditName"><span class="si-icon">✏️</span>앱 이름 변경</button>
+    <button class="settings-item" id="btnTheme"><span class="si-icon">🎨</span>테마 색상</button>
+    <button class="settings-item" id="btnExport"><span class="si-icon">📤</span>데이터 백업</button>
+    <button class="settings-item" id="btnImport"><span class="si-icon">📥</span>데이터 복원</button>
     <input type="file" id="importFile" accept=".json" style="display:none">
   </div>
 </nav>
@@ -361,6 +370,33 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- ══ 모달: 앱 이름 변경 ══ -->
+<div class="modal" id="modalName">
+  <div class="modal-box" style="max-width:380px">
+    <div class="modal-header"><h3>앱 이름 변경</h3><button class="modal-close">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>앱 이름</label><input type="text" id="appNameInput" maxlength="20" placeholder="예: 내 차계부"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary modal-close">취소</button>
+      <button class="btn-primary" id="btnSaveName">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 모달: 테마 색상 ══ -->
+<div class="modal" id="modalTheme">
+  <div class="modal-box" style="max-width:380px">
+    <div class="modal-header"><h3>테마 색상 선택</h3><button class="modal-close">✕</button></div>
+    <div class="modal-body">
+      <div class="theme-grid" id="themeGrid"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary modal-close">닫기</button>
+    </div>
+  </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="js/data.js"></script>
 <script src="js/app.js"></script>
