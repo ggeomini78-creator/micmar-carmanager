@@ -136,6 +136,26 @@ function renderVehicleSelector() {
     sel.appendChild(opt);
   });
   sel.onchange = () => { if (sel.value) setCurrentVehicle(sel.value); };
+
+  // 수정/삭제 버튼 렌더링
+  const actions = document.getElementById('vehicleActions');
+  actions.innerHTML = '';
+  if (currentVehicleId) {
+    const editBtn = document.createElement('button');
+    editBtn.className = 'veh-action-btn';
+    editBtn.title = '차량 정보 수정';
+    editBtn.innerHTML = '✏️ 수정';
+    editBtn.onclick = openEditVehicle;
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'veh-action-btn veh-del-btn';
+    delBtn.title = '차량 삭제';
+    delBtn.innerHTML = '🗑 삭제';
+    delBtn.onclick = doDeleteVehicle;
+
+    actions.appendChild(editBtn);
+    actions.appendChild(delBtn);
+  }
 }
 
 function setCurrentVehicle(id) {
@@ -566,6 +586,7 @@ function initButtons() {
   document.getElementById('btnAddVehicle').onclick = () => openModal('modalVehicle');
   document.getElementById('btnAddVehicleMain').onclick = () => openModal('modalVehicle');
   document.getElementById('btnSaveVehicle').onclick = saveVehicle;
+  document.getElementById('btnSaveEditVehicle').onclick = saveEditVehicle;
 
   // 대시보드 카드 클릭
   document.getElementById('cardMileage').onclick = () => navigateTo('fuel');
@@ -655,6 +676,51 @@ function saveVehicle() {
   renderVehicleSelector();
   const vs=getVehicles(); setCurrentVehicle(vs[vs.length-1].id);
   showToast('✅ 차량이 추가되었습니다');
+}
+
+function openEditVehicle() {
+  const v = getVehicle(currentVehicleId); if (!v) return;
+  document.getElementById('evNickname').value = v.nickname || '';
+  document.getElementById('evMake').value = v.make || '';
+  document.getElementById('evModel').value = v.model || '';
+  document.getElementById('evYear').value = v.year || '';
+  document.getElementById('evPlate').value = v.plate || '';
+  document.getElementById('evMileage').value = v.mileage || '';
+  openModal('modalEditVehicle');
+}
+
+function saveEditVehicle() {
+  const nickname = document.getElementById('evNickname').value.trim();
+  if (!nickname) { showToast('⚠️ 차량 이름을 입력해주세요'); return; }
+  updateVehicle(currentVehicleId, {
+    nickname,
+    make: document.getElementById('evMake').value.trim(),
+    model: document.getElementById('evModel').value.trim(),
+    year: parseInt(document.getElementById('evYear').value) || null,
+    plate: document.getElementById('evPlate').value.trim(),
+    mileage: parseInt(document.getElementById('evMileage').value) || 0,
+  });
+  document.getElementById('modalEditVehicle').classList.remove('open');
+  document.getElementById('currentVehicleBadge').textContent = nickname;
+  renderVehicleSelector();
+  refreshCurrentPage();
+  showToast('✅ 차량 정보가 수정되었습니다');
+}
+
+function doDeleteVehicle() {
+  const v = getVehicle(currentVehicleId); if (!v) return;
+  if (!confirm(`"${v.nickname}" 차량과 모든 기록을 삭제할까요?\n이 작업은 되돌릴 수 없습니다.`)) return;
+  deleteVehicle(currentVehicleId);
+  currentVehicleId = null;
+  localStorage.removeItem('carManager_currentVehicle');
+  const remaining = getVehicles();
+  if (remaining.length) setCurrentVehicle(remaining[0].id);
+  else {
+    document.getElementById('currentVehicleBadge').textContent = '미선택';
+    renderVehicleSelector();
+    renderPage('dashboard');
+  }
+  showToast('🗑 차량이 삭제되었습니다');
 }
 
 function saveFuel() {

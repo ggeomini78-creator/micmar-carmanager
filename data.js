@@ -53,6 +53,18 @@ function addVehicle(v) {
   saveDB(db);
   return id;
 }
+function updateVehicle(id, v) {
+  const db = getDB();
+  const idx = db.vehicles.findIndex(x => x.id === id);
+  if (idx !== -1) db.vehicles[idx] = { ...db.vehicles[idx], ...v };
+  saveDB(db);
+}
+function deleteVehicle(id) {
+  const db = getDB();
+  db.vehicles = db.vehicles.filter(v => v.id !== id);
+  delete db.logs[id];
+  saveDB(db);
+}
 function _updateMileage(db, id, km) {
   const v = db.vehicles.find(x => x.id === id);
   if (v && km && km > (v.mileage || 0)) v.mileage = km;

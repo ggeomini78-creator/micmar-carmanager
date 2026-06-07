@@ -14,7 +14,7 @@
   <meta name="apple-mobile-web-app-title" content="카매니저">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Bebas+Neue&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="app-shell">
@@ -28,6 +28,7 @@
   </div>
   <div class="vehicle-selector">
     <select id="vehicleSelect" class="vehicle-select"></select>
+    <div id="vehicleActions" class="vehicle-actions"></div>
     <button class="btn-add-vehicle" id="btnAddVehicle">+ 차량 추가</button>
   </div>
 
@@ -223,6 +224,29 @@
 
 <div class="overlay" id="overlay"></div>
 
+<!-- ══ 모달: 차량 수정 ══ -->
+<div class="modal" id="modalEditVehicle">
+  <div class="modal-box">
+    <div class="modal-header"><h3>차량 정보 수정</h3><button class="modal-close">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>차량 이름 *</label><input type="text" id="evNickname" placeholder="예: 내 아반떼"></div>
+      <div class="form-row">
+        <div class="form-group"><label>제조사</label><input type="text" id="evMake" placeholder="예: 현대"></div>
+        <div class="form-group"><label>모델명</label><input type="text" id="evModel" placeholder="예: 아반떼"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>연식</label><input type="number" id="evYear" placeholder="2022" min="1990" max="2030"></div>
+        <div class="form-group"><label>차량번호</label><input type="text" id="evPlate" placeholder="123가 4567"></div>
+      </div>
+      <div class="form-group"><label>현재 주행거리 (km)</label><input type="number" id="evMileage" placeholder="예: 25000" min="0"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary modal-close">취소</button>
+      <button class="btn-primary" id="btnSaveEditVehicle">저장</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ 모달: 차량 추가 ══ -->
 <div class="modal" id="modalVehicle">
   <div class="modal-box">
@@ -404,7 +428,7 @@
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="js/data.js"></script>
-<script src="js/app.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

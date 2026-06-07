@@ -47,6 +47,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); }
 .btn-add-vehicle { width: 100%; background: transparent; border: 1px dashed var(--accent); color: var(--accent); border-radius: 8px; padding: .35rem; font-size: .78rem; cursor: pointer; font-family: var(--font); transition: background .2s; }
 .btn-add-vehicle:hover { background: rgba(var(--accent-rgb),.08); }
 
+.vehicle-actions { display: flex; gap: .3rem; margin-bottom: .4rem; }
+.veh-action-btn { flex: 1; background: var(--bg3); border: 1px solid var(--border); color: var(--text2); border-radius: 7px; padding: .3rem .4rem; font-size: .75rem; cursor: pointer; font-family: var(--font); transition: all .15s; }
+.veh-action-btn:hover { background: var(--surface2); color: var(--text); }
+.veh-del-btn:hover { background: rgba(255,71,87,.12); color: var(--red); border-color: var(--red); }
+
 .nav-menu { list-style: none; padding: .5rem 0; flex: 1; overflow-y: auto; }
 .nav-item { display: flex; align-items: center; gap: .55rem; padding: .6rem .8rem; cursor: pointer; border-radius: 8px; margin: .08rem .4rem; color: var(--text2); font-size: .85rem; transition: all .15s; }
 .nav-item:hover { background: var(--bg3); color: var(--text); }
